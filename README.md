@@ -4,7 +4,7 @@ A simple API for accessing entries from a CaRMS database.
 
 It uses PostgreSQL for storage, Dagster for pipeline orchestration, and interfaces with SQLAlchemy and FastAPI.
 
-Currently, the API lists the first N programs currently stored in the database to demonstrate familiarity with the stack. Future plans include expanding functionality, such as integrating LangChain.
+Currently, the API lists the first N programs currently stored in the database to demonstrate familiarity with the stack. Future plans include expanding functionality, such as search functions and integrating LangChain.
 
 ## HOW TO RUN (LOCAL)
 
