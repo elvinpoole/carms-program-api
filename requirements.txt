@@ -3,3 +3,6 @@ fastapi
 sqlalchemy
 pandas
 psycopg2-binary
+dagster
+dagster-webserver
+dagster-postgres

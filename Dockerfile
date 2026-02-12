@@ -16,7 +16,7 @@ COPY ./app ./app
 COPY ./pipelines ./pipelines
 
 # Expose port
-EXPOSE 8000
+EXPOSE 8000 3000
 
 # Start server
 CMD ["./run.sh"]

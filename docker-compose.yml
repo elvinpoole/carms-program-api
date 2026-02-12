@@ -1,21 +1,9 @@
 version: "3.9"
 
 services:
-  api:
-    build: .
-    container_name: carms-api
-    ports:
-      - "8000:8000"
-    volumes:
-      - ./data:/app/data
-    environment:
-      - DATABASE_URL=postgresql://postgres:password@db:5432/carms
-    depends_on:
-      - db
 
-  db:
+  postgres:
     image: postgres:15
-    container_name: carms-db
     environment:
       POSTGRES_USER: postgres
       POSTGRES_PASSWORD: password
@@ -24,6 +12,54 @@ services:
       - "5432:5432"
     volumes:
       - postgres_data:/var/lib/postgresql/data
+
+  fastapi:
+    build: .
+    command: uvicorn app.main:app --host 0.0.0.0 --port 8000
+    environment:
+      DATABASE_URL: postgresql://postgres:password@postgres:5432/carms
+    volumes:
+      - ./data:/app/data
+    depends_on:
+      - postgres
+    ports:
+      - "8000:8000"
+
+  dagster_web:
+    build: .
+    command: dagster-webserver -h 0.0.0.0 -p 3000 -w pipelines/workspace.yaml
+    environment:
+      DATABASE_URL: postgresql://postgres:password@postgres:5432/carms
+      DAGSTER_HOME: /app/dagster_home
+    volumes:
+      - ./data:/app/data
+      - ./dagster_home:/app/dagster_home
+    depends_on:
+      - postgres
+    ports:
+      - "3000:3000"
+
+  dagster_daemon:
+    build: .
+    command: dagster-daemon run -w pipelines/workspace.yaml
+    environment:
+      DATABASE_URL: postgresql://postgres:password@postgres:5432/carms
+      DAGSTER_HOME: /app/dagster_home
+    volumes:
+      - ./data:/app/data
+      - ./dagster_home:/app/dagster_home
+
+  dagster_run_once:
+    build: .
+    command: dagster job execute -f pipelines/dagster_defs.py -j materialize_all_assets
+    environment:
+      DATABASE_URL: postgresql://postgres:password@postgres:5432/carms
+      DAGSTER_HOME: /app/dagster_home
+    volumes:
+      - ./data:/app/data
+      - ./dagster_home:/app/dagster_home
+    depends_on:
+      - postgres
 
 volumes:
   postgres_data:
