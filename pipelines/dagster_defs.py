@@ -18,7 +18,13 @@ SessionLocal = sessionmaker(bind=engine)
 
 @asset
 def raw_program_data() -> pd.DataFrame:
-    """Load all CSV files into a single DataFrame."""
+    """
+    Load all CSV files into a single DataFrame.
+    
+    Concatenates all files in the directory 
+    (Though our example only has one file!)
+    """
+
     all_files = glob.glob(os.path.join(DATA_DIR, "*.csv"))
     dfs = [pd.read_csv(f) for f in all_files]
     return pd.concat(dfs, ignore_index=True) if dfs else pd.DataFrame()
@@ -29,10 +35,12 @@ def cleaned_program_data(raw_program_data: pd.DataFrame) -> pd.DataFrame:
     if raw_program_data.empty:
         return raw_program_data
 
+    #for this simple example I will only keep a few columns
     columns_to_keep = ["program_name", "document_id", "source"]
     df = raw_program_data[columns_to_keep].drop_duplicates()
 
-    # Convert document_id to string and remove dashes
+    # document_id is in the form XXXX-YYYY
+    # We will load as a string and remove the dash so we can use int XXXXYYYY as the ID
     df["document_id"] = df["document_id"].astype(str).str.replace("-", "", regex=False).astype(int)
 
     return df
@@ -44,21 +52,30 @@ def programs_table(cleaned_program_data: pd.DataFrame):
     if cleaned_program_data.empty:
         return
 
+    #This should ensure all the correct tables are in place before trying to add anything
+    #Base is from SQLAlchemy and all the tables in app/models should be linked to it
     Base.metadata.create_all(engine)
 
+    #starts the database session
     with SessionLocal() as session:
+        #add the data one row at a time
         for _, row in cleaned_program_data.iterrows():
             program = Program(
                 document_id=row.document_id,
                 program_name=row.program_name,
                 source=row.source,
             )
+            
+            # if a program with this ID already exists this updated the entry
+            # if not it adds it
             session.merge(program)  # idempotent insert/update
 
+        #execute the database construction
         session.commit()
 
     return f"Inserted {len(cleaned_program_data)} records."
 
+# We always want this to run once at build. Dagster can then be used to re-run or schedule runs
 @job
 def materialize_all_assets():
     programs_table(cleaned_program_data(raw_program_data()))
