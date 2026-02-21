@@ -1,7 +1,7 @@
 from fastapi import FastAPI, Depends
 from sqlalchemy.orm import Session
 from .database import SessionLocal, engine
-from .crud import get_programs
+from .crud import get_programs, filter_programs_by_province
 from .models import Base
 
 # Create tables if they don't exist
@@ -26,4 +26,10 @@ def root():
 @app.get("/programs")
 def read_programs(limit: int = 100, db: Session = Depends(get_db)):
     programs = get_programs(db, limit)
-    return [{"document_id": p.document_id, "program_name": p.program_name, "source": p.source} for p in programs]
+    return [{"document_id": p.document_id, "program_name": p.program_name, "source": p.source, "province_or_territory": p.province_or_territory} for p in programs]
+
+#Filter by province or territory
+@app.get("/filter")
+def read_programs(input: str = "", limit: int = 100, db: Session = Depends(get_db)):
+    programs = filter_programs_by_province(db, input, limit)
+    return [{"program_name": p.program_name, "source": p.source} for p in programs]

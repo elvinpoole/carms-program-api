@@ -11,3 +11,4 @@ class Program(Base):
     document_id = Column(Integer, primary_key=True, index=True)
     program_name = Column(Text)
     source = Column(Text)
+    province_or_territory = Column(Text)

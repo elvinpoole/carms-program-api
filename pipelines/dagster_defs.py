@@ -5,6 +5,7 @@ from dagster import asset, Definitions, job
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
 from app.models import Base, Program
+from pipelines.utils import extract_provinces
 
 DATA_DIR = "data/"
 DB_URL = os.getenv(
@@ -43,6 +44,12 @@ def cleaned_program_data(raw_program_data: pd.DataFrame) -> pd.DataFrame:
     # We will load as a string and remove the dash so we can use int XXXXYYYY as the ID
     df["document_id"] = df["document_id"].astype(str).str.replace("-", "", regex=False).astype(int)
 
+    # Iterate over all the match_iteration_name entries to find the names of 
+    # any provinces and territories mentioned 
+    # (TODO: there will be faster ways to do this, but fine for small example)
+    df["province_or_territory"] = [extract_provinces(x) for x in raw_program_data["match_iteration_name"]]
+    print('province_or_territory added')
+
     return df
 
 
@@ -64,6 +71,7 @@ def programs_table(cleaned_program_data: pd.DataFrame):
                 document_id=row.document_id,
                 program_name=row.program_name,
                 source=row.source,
+                province_or_territory=row.province_or_territory
             )
             
             # if a program with this ID already exists this updated the entry
