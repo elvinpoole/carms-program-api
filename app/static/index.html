@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>CaRMS Programs Search</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 500px;
+            margin: 60px auto;
+        }
+        label {
+            display: block;
+            margin-top: 20px;
+            font-weight: bold;
+        }
+        input, select, button {
+            margin-top: 5px;
+            padding: 8px;
+            width: 100%;
+            font-size: 14px;
+        }
+        button {
+            margin-top: 25px;
+            cursor: pointer;
+        }
+    </style>
+</head>
+<body>
+
+<h2>Search CaRMS Programs</h2>
+
+<label for="province">Province or Territory</label>
+<select id="province">
+    <option value="">-- Select --</option>
+    <option>Alberta</option>
+    <option>British Columbia</option>
+    <option>Manitoba</option>
+    <option>New Brunswick</option>
+    <option>Newfoundland and Labrador</option>
+    <option>Nova Scotia</option>
+    <option>Ontario</option>
+    <option>Prince Edward Island</option>
+    <option>Quebec</option>
+    <option>Saskatchewan</option>
+    <option>Northwest Territories</option>
+    <option>Nunavut</option>
+    <option>Yukon</option>
+</select>
+
+<label for="limit">Limit</label>
+<input type="number" id="limit" value="10" min="1">
+
+<button onclick="search()">Search</button>
+
+<script>
+function search() {
+    const province = document.getElementById("province").value;
+    const limit = document.getElementById("limit").value || 10;
+
+    if (!province) {
+        alert("Please select a province or territory.");
+        return;
+    }
+
+    const url = `/filter?input=${encodeURIComponent(province)}&limit=${limit}`;
+    window.location.href = url;
+}
+</script>
+
+</body>
+</html>
