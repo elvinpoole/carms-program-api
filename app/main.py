@@ -17,10 +17,12 @@ def get_db():
     finally:
         db.close()
 
+#Title page
 @app.get("/")
 def root():
     return {"message": "Welcome to the CaRMS Programs API. Use /programs to see data."}
 
+#List all programs
 @app.get("/programs")
 def read_programs(limit: int = 100, db: Session = Depends(get_db)):
     programs = get_programs(db, limit)

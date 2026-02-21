@@ -6,5 +6,6 @@ DATABASE_URL = os.getenv(
     "DATABASE_URL", "postgresql://postgres:password@postgres:5432/carms"
 )
 
+# set up the database
 engine = create_engine(DATABASE_URL)
 SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
