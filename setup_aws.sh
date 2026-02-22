@@ -3,6 +3,8 @@
 # running Amazon linux OS
 set -euo pipefail
 
+cd ..
+
 #install
 sudo yum install -y git
 sudo yum install docker -y
@@ -16,8 +18,7 @@ newgrp docker
 sudo systemctl start docker
 sudo systemctl enable docker  # optional, starts on boot
 
-#checkout the repo and unzip the data to where it needs to be
-git clone https://github.com/elvinpoole/carms-program-api.git
+#checkout the data repo and unzip the data to where it needs to be
 git clone https://github.com/dnokes/Junior-Data-Scientist.git
 unzip Junior-Data-Scientist/1503_program_descriptions_x_section.zip -d carms-program-api/data/
 cd carms-program-api/
