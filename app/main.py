@@ -1,7 +1,7 @@
 from fastapi import FastAPI, Depends
 from sqlalchemy.orm import Session
 from .database import SessionLocal, engine
-from .crud import get_programs, filter_programs_by_province
+from .crud import get_programs, filter_programs_by_province, semantic_search
 from .models import Base
 from fastapi.staticfiles import StaticFiles
 from fastapi.responses import FileResponse
@@ -41,4 +41,9 @@ def read_programs(limit: int = 100, db: Session = Depends(get_db)):
 @app.get("/filter")
 def read_programs(input: str = "", limit: int = 100, db: Session = Depends(get_db)):
     programs = filter_programs_by_province(db, input, limit)
+    return [{"program_name": p.program_name, "source": p.source} for p in programs]
+
+@app.get("/semanticsearch")
+def semantic_search_endpoint(query: str, limit: int = 5, db: Session = Depends(get_db)):
+    programs = semantic_search(db, query, limit)
     return [{"program_name": p.program_name, "source": p.source} for p in programs]

@@ -6,3 +6,5 @@ psycopg2-binary
 dagster
 dagster-webserver
 dagster-postgres
+pgvector
+langchain_openai

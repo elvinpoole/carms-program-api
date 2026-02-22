@@ -16,6 +16,9 @@ DB_URL = os.getenv(
 engine = create_engine(DB_URL)
 SessionLocal = sessionmaker(bind=engine)
 
+#embeddings for LLM search
+from langchain_openai import OpenAIEmbeddings
+embeddings = OpenAIEmbeddings()
 
 @asset
 def raw_program_data() -> pd.DataFrame:
@@ -50,6 +53,18 @@ def cleaned_program_data(raw_program_data: pd.DataFrame) -> pd.DataFrame:
     df["province_or_territory"] = [extract_provinces(x) for x in raw_program_data["match_iteration_name"]]
     print('province_or_territory added')
 
+    #build the embedding from some of the string type columns
+    strings = (
+        raw_program_data["program_name"] + 
+        raw_program_data["match_iteration_name"] + 
+        raw_program_data["program_contracts"] + 
+        raw_program_data["general_instructions"] + 
+        raw_program_data["supporting_documentation_information"]
+    ).astype(str).tolist()# convert Series to list of strings
+
+    vectors = embeddings.embed_documents(strings)     # batch embedding
+    df["vector"] = vectors
+
     return df
 
 
@@ -71,7 +86,8 @@ def programs_table(cleaned_program_data: pd.DataFrame):
                 document_id=row.document_id,
                 program_name=row.program_name,
                 source=row.source,
-                province_or_territory=row.province_or_territory
+                province_or_territory=row.province_or_territory,
+                vector=row.vector,
             )
             
             # if a program with this ID already exists this updated the entry

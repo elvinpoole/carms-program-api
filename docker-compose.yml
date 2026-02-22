@@ -3,7 +3,7 @@ version: "3.9"
 services:
 
   postgres:
-    image: postgres:15
+    image: pgvector/pgvector:pg15
     environment:
       POSTGRES_USER: postgres
       POSTGRES_PASSWORD: password
@@ -12,12 +12,15 @@ services:
       - "5432:5432"
     volumes:
       - postgres_data:/var/lib/postgresql/data
+      - ./init.sql:/docker-entrypoint-initdb.d/init.sql
 
   fastapi:
     build: .
     command: uvicorn app.main:app --host 0.0.0.0 --port 8000
     environment:
       DATABASE_URL: postgresql://postgres:password@postgres:5432/carms
+    env_file:
+      - .env
     volumes:
       - ./data:/app/data
     depends_on:
@@ -31,6 +34,8 @@ services:
     environment:
       DATABASE_URL: postgresql://postgres:password@postgres:5432/carms
       DAGSTER_HOME: /app/dagster_home
+    env_file:
+      - .env
     volumes:
       - ./data:/app/data
       - ./dagster_home:/app/dagster_home
@@ -45,6 +50,8 @@ services:
     environment:
       DATABASE_URL: postgresql://postgres:password@postgres:5432/carms
       DAGSTER_HOME: /app/dagster_home
+    env_file:
+      - .env
     volumes:
       - ./data:/app/data
       - ./dagster_home:/app/dagster_home
@@ -55,6 +62,8 @@ services:
     environment:
       DATABASE_URL: postgresql://postgres:password@postgres:5432/carms
       DAGSTER_HOME: /app/dagster_home
+    env_file:
+      - .env
     volumes:
       - ./data:/app/data
       - ./dagster_home:/app/dagster_home
