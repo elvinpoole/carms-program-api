@@ -1,12 +1,11 @@
 #!/bin/bash
 # To be run on AWS EC2
 # running Amazon linux OS
-set -euo pipefail
+set -e
 
 cd ..
 
 #install
-sudo yum install -y git
 sudo yum install docker -y
 sudo yum install -y libxcrypt-compat
 sudo curl -L "https://github.com/docker/compose/releases/download/1.29.2/docker-compose-$(uname -s)-$(uname -m)" \

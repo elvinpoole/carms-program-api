@@ -15,10 +15,23 @@ Build the image and start containers
 docker compose up --build
 ```
 
-View the results in a browser at http://localhost:8000/programs?limit=5
+View the results in a browser at http://localhost:8000/frontend
 and view (and re-run) the pipelines (dagster) at http://localhost:3000/
 
-## AWS
+## HOW TO RUN (AWS)
+
+1) install git and clone this repo
+```
+sudo yum install -y git
+git clone https://github.com/elvinpoole/carms-program-api.git
+cd carms-program-api/
+```
+
+2) run the AWS setup script
+```
+./setup_aws.sh
+```
+
 
 This API can also be run on AWS (e.g., EC2) using the docker image. A hosted version is available on request for demonstration purposes.
 
